@@ -1,0 +1,24 @@
+<h2>Tweety</h2>
+<table class = "table table-striped">
+  <thead>
+  <tr>
+    <th>Treść</th>
+    <th>Data utworzenia</th>
+    <th>Autor</th>
+    <th>Jezyk</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor = "let tweet of tweets" >
+    <td> {{ tweet.text }} </td>
+    <td> {{ tweet.createdAt }} </td>
+    <td> {{ tweet.author.name }} </td>
+    <td> {{ tweet.lang }} </td>
+    <!--<td>
+      <button (click) = "showTweet(keyword.id)" class = "btn btn-info">Zobacz tweety</button>
+      &lt;!&ndash;<button (click) = "deleteEmployee(employee.id)" class = "btn btn-danger" style="margin-left: 10px"> Delete</button>
+     <button (click) = "employeeDetails(employee.id)" class = "btn btn-info" style="margin-left: 10px"> View</button>&ndash;&gt;
+    </td>-->
+  </tr>
+  </tbody>
+</table>

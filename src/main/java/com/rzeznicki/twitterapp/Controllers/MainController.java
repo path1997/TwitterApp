@@ -6,29 +6,21 @@ import com.rzeznicki.twitterapp.Entities.Tweet;
 import com.rzeznicki.twitterapp.Repo.AuthorRepo;
 import com.rzeznicki.twitterapp.Repo.KeywordRepo;
 import com.rzeznicki.twitterapp.Repo.TweetRepo;
-import io.github.redouane59.twitter.TwitterClient;
-import io.github.redouane59.twitter.dto.list.TwitterList;
-import io.github.redouane59.twitter.dto.tweet.TweetList;
-import io.github.redouane59.twitter.dto.tweet.TweetV2;
-import io.github.redouane59.twitter.signature.TwitterCredentials;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import twitter4j.*;
-import twitter4j.conf.ConfigurationBuilder;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.List;
 
-@Controller
+@CrossOrigin(origins = "http://localhost:4200")
+@RestController
+@RequestMapping("/api/v1/")
 public class MainController {
 
     private final TweetRepo tweetRepo;
@@ -86,6 +78,18 @@ public class MainController {
         TweetV2.TweetData tweetData= tweetList.;
         System.out.printf(tweetData);
         Tweet*/
+        System.out.println(keywordRepo.findAll().toString());
         return "index";
     }
+
+    @GetMapping("/keywords")
+    public Iterable<Keyword> getAllKeywords(){
+        return keywordRepo.findAll();
+    }
+
+    @GetMapping("/tweets/{id}")
+    public Iterable<Tweet> getAllTweetsById(@PathVariable Long id){
+        return tweetRepo.findAllByKeywordId(id);
+    }
+
 }

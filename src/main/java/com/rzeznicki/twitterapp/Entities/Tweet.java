@@ -1,4 +1,6 @@
 package com.rzeznicki.twitterapp.Entities;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.data.annotation.Id;
 
 import javax.persistence.Entity;
@@ -14,10 +16,12 @@ public class Tweet {
     private Long id;
     private String createdAt;
     private String text;
+    @JsonIgnoreProperties(value = {"tweets"})
     @ManyToOne
     @JoinColumn(name = "authorId")
     private Author author;
     private String lang;
+    @JsonIgnoreProperties(value = {"tweets"})
     @ManyToOne
     @JoinColumn(name = "keywordId")
     private Keyword keyword;

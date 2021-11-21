@@ -1,0 +1,23 @@
+<h2> Słowa kluczowe</h2>
+<table class = "table table-striped">
+  <thead>
+  <tr>
+    <th>Słowo kluczowe</th>
+    <th>W ilu tweetach został odnaleziony</th>
+    <th>W ilu tweetach został odnaleziony (ostatnie wyszukiwanie)</th>
+    <th></th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor = "let keyword of keywords" >
+    <td> {{ keyword.name }} </td>
+    <td> {{ keyword.twitCounter }} </td>
+    <td> {{ keyword.twitCounterLastSearch }} </td>
+    <td>
+     <button (click) = "showTweet(keyword.id)" class = "btn btn-info">Zobacz tweety</button>
+      <!--<button (click) = "deleteEmployee(employee.id)" class = "btn btn-danger" style="margin-left: 10px"> Delete</button>
+     <button (click) = "employeeDetails(employee.id)" class = "btn btn-info" style="margin-left: 10px"> View</button>-->
+    </td>
+  </tr>
+  </tbody>
+</table>

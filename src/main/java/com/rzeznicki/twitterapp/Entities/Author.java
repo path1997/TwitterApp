@@ -1,5 +1,6 @@
 package com.rzeznicki.twitterapp.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Id;
 
@@ -14,11 +15,8 @@ import java.util.List;
 public class Author {
     @javax.persistence.Id
     @Id
-    @JsonProperty("id")
     private Long id;
-    @JsonProperty("name")
     private String name;
-    @JsonProperty("username")
     private String userName;
     @OneToMany(mappedBy = "author")
     private List<Tweet> tweets;

@@ -6,11 +6,15 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import {FormsModule} from "@angular/forms";
 import { InitViewComponent } from './init-view/init-view.component';
+import { KeywordsComponent } from './keywords/keywords.component';
+import { TweetsComponent } from './tweets/tweets.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    InitViewComponent
+    InitViewComponent,
+    KeywordsComponent,
+    TweetsComponent
   ],
   imports: [
     BrowserModule,

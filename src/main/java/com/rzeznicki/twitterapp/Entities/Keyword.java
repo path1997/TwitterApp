@@ -1,5 +1,6 @@
 package com.rzeznicki.twitterapp.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Id;
 
 import javax.persistence.*;
@@ -16,6 +17,7 @@ public class Keyword {
     private String name;
     private int twitCounter;
     private int twitCounterLastSearch;
+    @JsonIgnore
     @OneToMany(mappedBy = "keyword")
     private List<Tweet> tweets;
 
@@ -68,4 +70,5 @@ public class Keyword {
     public void setTweets(List<Tweet> tweets) {
         this.tweets = tweets;
     }
+
 }
