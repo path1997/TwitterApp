@@ -16,9 +16,18 @@ public class Keyword {
     private String name;
     private int twitCounter;
     private int twitCounterLastSearch;
-
     @OneToMany(mappedBy = "keyword")
-    private List<Twit> twits;
+    private List<Tweet> tweets;
+
+    public Keyword() {
+    }
+
+    public Keyword(String name, int twitCounter, int twitCounterLastSearch) {
+        this.name = name;
+        this.twitCounter = twitCounter;
+        this.twitCounterLastSearch = twitCounterLastSearch;
+        this.tweets = tweets;
+    }
 
     public Long getId() {
         return id;
@@ -52,11 +61,11 @@ public class Keyword {
         this.twitCounterLastSearch = twitCounterLastSearch;
     }
 
-    public List<Twit> getTwits() {
-        return twits;
+    public List<Tweet> getTweets() {
+        return tweets;
     }
 
-    public void setTwits(List<Twit> twits) {
-        this.twits = twits;
+    public void setTweets(List<Tweet> tweets) {
+        this.tweets = tweets;
     }
 }
