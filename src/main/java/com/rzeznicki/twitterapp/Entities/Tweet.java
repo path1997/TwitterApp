@@ -3,10 +3,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.data.annotation.Id;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.Date;
 import java.util.List;
 @Entity
 @Table(name = "tweets")
@@ -14,7 +12,8 @@ public class Tweet {
     @javax.persistence.Id
     @Id
     private Long id;
-    private String createdAt;
+    private Date createdAt;
+    @Column(length = 10000)
     private String text;
     @JsonIgnoreProperties(value = {"tweets"})
     @ManyToOne
@@ -29,7 +28,7 @@ public class Tweet {
     public Tweet() {
     }
 
-    public Tweet(Long id, String createdAt, String text, Author author, String lang, Keyword keyword) {
+    public Tweet(Long id, Date createdAt, String text, Author author, String lang, Keyword keyword) {
         this.id = id;
         this.createdAt = createdAt;
         this.text = text;
@@ -46,11 +45,11 @@ public class Tweet {
         this.id = id;
     }
 
-    public String getCreatedAt() {
+    public Date getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(String createdAt) {
+    public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
 

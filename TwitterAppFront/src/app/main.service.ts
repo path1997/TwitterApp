@@ -15,10 +15,14 @@ export class MainService {
   getKeywordsList() :Observable<Keyword[]>{
     return this.httpClient.get<Keyword[]>(`${this.baseURL}/keywords`);
   }
-  createKeyWord(keywordString: String): Observable<Object>{
-    return this.httpClient.post(`${this.baseURL}`,keywordString);
+  createKeyword(keywordString: String): Observable<Object>{
+    return this.httpClient.post(`${this.baseURL}/keywords`,keywordString);
   }
   getTweetsListById(id: number) :Observable<Tweet[]>{
     return this.httpClient.get<Tweet[]>(`${this.baseURL}/tweets/${id}`);
+  }
+
+  deleteKeyword(id: number) :Observable<Object>{
+    return this.httpClient.post(`${this.baseURL}/keyword/delete`,id);
   }
 }

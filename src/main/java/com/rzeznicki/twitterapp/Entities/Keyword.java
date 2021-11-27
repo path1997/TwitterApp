@@ -28,7 +28,6 @@ public class Keyword {
         this.name = name;
         this.twitCounter = twitCounter;
         this.twitCounterLastSearch = twitCounterLastSearch;
-        this.tweets = tweets;
     }
 
     public Long getId() {

@@ -1,4 +1,12 @@
-<h2> Słowa kluczowe</h2>
+<h2>Słowa kluczowe</h2>
+<form (ngSubmit) = "onSubmit()">
+  <div class="form-group">
+    <label>Dodaj słowo klucz</label>
+    <input type="text" class ="form-control" id = "keyword"
+           [(ngModel)] = "keyword.name" name = "keyword">
+  </div>
+  <button class = "btn btn-success" type ="submit">Dodaj</button>
+</form>
 <table class = "table table-striped">
   <thead>
   <tr>
@@ -15,6 +23,8 @@
     <td> {{ keyword.twitCounterLastSearch }} </td>
     <td>
      <button (click) = "showTweet(keyword.id)" class = "btn btn-info">Zobacz tweety</button>
+      <button (click) = "showTweetByAuthor(keyword.name)" class = "btn btn-info">Zobacz autorów</button>
+     <button (click) = "deleteKeyword(keyword.id)" class = "btn btn-info">Usuń</button>
       <!--<button (click) = "deleteEmployee(employee.id)" class = "btn btn-danger" style="margin-left: 10px"> Delete</button>
      <button (click) = "employeeDetails(employee.id)" class = "btn btn-info" style="margin-left: 10px"> View</button>-->
     </td>

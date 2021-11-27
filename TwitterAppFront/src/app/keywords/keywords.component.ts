@@ -11,7 +11,7 @@ import {MainService} from "../main.service";
 export class KeywordsComponent implements OnInit {
 
   keywords: Keyword[];
-
+  keyword: Keyword = new Keyword();
   constructor(private mainService: MainService,
               private router: Router) { }
 
@@ -28,4 +28,29 @@ export class KeywordsComponent implements OnInit {
     this.router.navigate(['tweets', id]);
   }
 
+  onSubmit(){
+    console.log(this.keyword);
+    this.createKeyword();
+  }
+
+  private createKeyword() {
+    this.mainService.createKeyword(this.keyword.name).subscribe( data =>{
+        console.log(data);
+        this.ngOnInit();
+      },
+      error => console.log(error));
+  }
+
+
+  deleteKeyword(id: number) {
+    this.mainService.deleteKeyword(id).subscribe(data =>{
+        console.log(data);
+        this.ngOnInit()
+    },
+      error => console.log(error))
+  }
+
+  showTweetByAuthor(name: string) {
+    this.router.navigate(['tweetByAuthor',name]);
+  }
 }
