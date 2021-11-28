@@ -24,6 +24,8 @@ public class Tweet {
     @ManyToOne
     @JoinColumn(name = "keywordId")
     private Keyword keyword;
+    @JsonIgnore
+    private boolean deleted;
 
     public Tweet() {
     }
@@ -35,6 +37,24 @@ public class Tweet {
         this.author = author;
         this.lang = lang;
         this.keyword = keyword;
+    }
+
+    public Tweet(Long id, Date createdAt, String text, Author author, String lang, Keyword keyword, boolean deleted) {
+        this.id = id;
+        this.createdAt = createdAt;
+        this.text = text;
+        this.author = author;
+        this.lang = lang;
+        this.keyword = keyword;
+        this.deleted = deleted;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     public Long getId() {
@@ -83,5 +103,18 @@ public class Tweet {
 
     public void setKeyword(Keyword keyword) {
         this.keyword = keyword;
+    }
+
+    @Override
+    public String toString() {
+        return "Tweet{" +
+                "id=" + id +
+                ", createdAt=" + createdAt +
+                ", text='" + text + '\'' +
+                ", author=" + author +
+                ", lang='" + lang + '\'' +
+                ", keyword=" + keyword +
+                ", deleted=" + deleted +
+                '}';
     }
 }

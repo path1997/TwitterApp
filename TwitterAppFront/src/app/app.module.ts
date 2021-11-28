@@ -8,13 +8,21 @@ import {FormsModule} from "@angular/forms";
 import { InitViewComponent } from './init-view/init-view.component';
 import { KeywordsComponent } from './keywords/keywords.component';
 import { TweetsComponent } from './tweets/tweets.component';
+import { AuthorTweetsComponent } from './author-tweets/author-tweets.component';
+import { TrashTweetsComponent } from './trash-tweets/trash-tweets.component';
+import { FavouriteAuthorsComponent } from './favourite-authors/favourite-authors.component';
+import { FavouriteAuthorTweetsComponent } from './favourite-author-tweets/favourite-author-tweets.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     InitViewComponent,
     KeywordsComponent,
-    TweetsComponent
+    TweetsComponent,
+    AuthorTweetsComponent,
+    TrashTweetsComponent,
+    FavouriteAuthorsComponent,
+    FavouriteAuthorTweetsComponent
   ],
   imports: [
     BrowserModule,

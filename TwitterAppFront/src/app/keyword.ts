@@ -1,6 +1,7 @@
 export class Keyword {
-  id: number;
+  id: string;
   name: string;
   twitCounter: number;
   twitCounterLastSearch: number;
+  keywordIsAuthor: boolean;
 }

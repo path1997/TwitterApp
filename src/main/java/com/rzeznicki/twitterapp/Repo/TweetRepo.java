@@ -9,7 +9,9 @@ import java.util.List;
 
 @Repository
 public interface TweetRepo extends CrudRepository<Tweet,Long> {
-    public int countTweetById(Long id);
-    public List<Tweet> findAllByKeywordIdOrderByCreatedAtDesc(Long id);
-    public void deleteAllByKeywordId(Long id);
+    int countTweetById(Long id);
+    List<Tweet> findAllByKeywordIdAndDeletedFalseOrderByCreatedAt(Long id);
+    void deleteAllByKeywordId(Long id);
+    List<Tweet> findAllByAuthorUserName(String name);
+
 }

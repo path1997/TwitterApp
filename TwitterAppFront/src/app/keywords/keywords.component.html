@@ -22,9 +22,9 @@
     <td> {{ keyword.twitCounter }} </td>
     <td> {{ keyword.twitCounterLastSearch }} </td>
     <td>
-     <button (click) = "showTweet(keyword.id)" class = "btn btn-info">Zobacz tweety</button>
-      <button (click) = "showTweetByAuthor(keyword.name)" class = "btn btn-info">Zobacz autorów</button>
-     <button (click) = "deleteKeyword(keyword.id)" class = "btn btn-info">Usuń</button>
+      <button (click) = "showTweet(keyword.id)" class = "btn btn-info">Zobacz tweety</button>
+      <button *ngIf="keyword.keywordIsAuthor" (click) = "showTweetByAuthor(keyword.name)" class = "btn btn-info">Zobacz autorów</button>
+      <button (click) = "deleteKeyword(keyword.id)" class = "btn btn-info">Usuń</button>
       <!--<button (click) = "deleteEmployee(employee.id)" class = "btn btn-danger" style="margin-left: 10px"> Delete</button>
      <button (click) = "employeeDetails(employee.id)" class = "btn btn-info" style="margin-left: 10px"> View</button>-->
     </td>

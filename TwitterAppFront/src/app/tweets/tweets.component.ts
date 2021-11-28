@@ -10,7 +10,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 })
 export class TweetsComponent implements OnInit {
 
-  id: number;
+  id: string;
   tweets: Tweet[];
   constructor(private mainService: MainService,
     private route: ActivatedRoute,
@@ -24,4 +24,18 @@ export class TweetsComponent implements OnInit {
     }, error => console.log(error));
   }
 
+  addAuthorToFavorite(id: string) {
+    this.mainService.addAuthorToFavourite(id).subscribe(data =>{
+        console.log(data);
+      },
+      error => console.log(error))
+  }
+
+  deleteTweetById(id: string) {
+    this.mainService.deleteTweetById(id).subscribe(data =>{
+        console.log(data);
+        this.ngOnInit()
+      },
+      error => console.log(error))
+  }
 }

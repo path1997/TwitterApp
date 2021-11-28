@@ -17,11 +17,20 @@ public class Keyword {
     private String name;
     private int twitCounter;
     private int twitCounterLastSearch;
+    private boolean keywordIsAuthor;
     @JsonIgnore
     @OneToMany(mappedBy = "keyword")
     private List<Tweet> tweets;
 
     public Keyword() {
+    }
+
+    public boolean isKeywordIsAuthor() {
+        return keywordIsAuthor;
+    }
+
+    public void setKeywordIsAuthor(boolean keywordIsAuthor) {
+        this.keywordIsAuthor = keywordIsAuthor;
     }
 
     public Keyword(String name, int twitCounter, int twitCounterLastSearch) {

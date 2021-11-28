@@ -24,7 +24,7 @@ export class KeywordsComponent implements OnInit {
       this.keywords = data;
     });
   }
-  showTweet(id: number){
+  showTweet(id: string){
     this.router.navigate(['tweets', id]);
   }
 
@@ -42,7 +42,7 @@ export class KeywordsComponent implements OnInit {
   }
 
 
-  deleteKeyword(id: number) {
+  deleteKeyword(id: string) {
     this.mainService.deleteKeyword(id).subscribe(data =>{
         console.log(data);
         this.ngOnInit()

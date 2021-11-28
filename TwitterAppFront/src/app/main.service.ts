@@ -3,6 +3,7 @@ import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {Keyword} from "./keyword";
 import {Tweet} from "./tweet";
+import {Author} from "./author";
 
 @Injectable({
   providedIn: 'root'
@@ -18,11 +19,27 @@ export class MainService {
   createKeyword(keywordString: String): Observable<Object>{
     return this.httpClient.post(`${this.baseURL}/keywords`,keywordString);
   }
-  getTweetsListById(id: number) :Observable<Tweet[]>{
+  getTweetsListById(id: string) :Observable<Tweet[]>{
     return this.httpClient.get<Tweet[]>(`${this.baseURL}/tweets/${id}`);
   }
 
-  deleteKeyword(id: number) :Observable<Object>{
+  deleteKeyword(id: string) :Observable<Object>{
     return this.httpClient.post(`${this.baseURL}/keyword/delete`,id);
+  }
+
+  getTweetsByAuthorName(name: string) :Observable<Tweet[]>{
+    return this.httpClient.get<Tweet[]>(`${this.baseURL}/tweetsByAuthorName/${name}`);
+  }
+
+  addAuthorToFavourite(id: string) :Observable<Object>{
+    return this.httpClient.post(`${this.baseURL}/addAuthorToFavourite`,id);
+  }
+
+  deleteTweetById(id: string) :Observable<Object>{
+    return this.httpClient.post(`${this.baseURL}/deleteTweet`,id);
+  }
+
+  getFavouriteAuthors() :Observable<Author[]>{
+    return this.httpClient.get<Author[]>(`${this.baseURL}/favouriteAuthors`);
   }
 }

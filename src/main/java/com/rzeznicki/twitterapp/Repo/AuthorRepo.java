@@ -6,5 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AuthorRepo extends CrudRepository<Author, Long> {
-    public int countAuthorById(Long id);
+    int countAuthorById(Long id);
+    boolean existsAuthorByUserName(String username);
 }

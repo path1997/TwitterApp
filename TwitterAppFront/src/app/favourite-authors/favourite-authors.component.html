@@ -1,0 +1,20 @@
+<h2>Ulubieni autorzy</h2>
+<table class = "table table-striped">
+  <thead>
+  <tr>
+    <th>Id</th>
+    <th>Nazwa</th>
+    <th></th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor = "let author of authors" >
+    <td> {{ author.id }} </td>
+    <td> {{ author.username }} </td>
+    <td>
+      <button (click) = "showFavouriteAuthorTweets(author.id)" class = "btn btn-info">Zobacz tweety</button>
+      <button (click) = "deleteFavouriteAuthor(author.id)" class = "btn btn-info">Usuń</button>
+    </td>
+  </tr>
+  </tbody>
+</table>

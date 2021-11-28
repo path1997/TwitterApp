@@ -20,6 +20,8 @@ public class Author {
     private String userName;
     @OneToMany(mappedBy = "author")
     private List<Tweet> tweets;
+    @JsonIgnore
+    private boolean favourite;
 
     public Author() {
     }
@@ -28,7 +30,21 @@ public class Author {
         this.id = id;
         this.name = name;
         this.userName = userName;
-        this.tweets = tweets;
+    }
+
+    public Author(Long id, String name, String userName, boolean favourite) {
+        this.id = id;
+        this.name = name;
+        this.userName = userName;
+        this.favourite = favourite;
+    }
+
+    public boolean isFavourite() {
+        return favourite;
+    }
+
+    public void setFavourite(boolean favourite) {
+        this.favourite = favourite;
     }
 
     public Long getId() {
