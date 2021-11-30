@@ -24,4 +24,9 @@ export class AuthorTweetsComponent implements OnInit {
     }, error => console.log(error));
   }
 
+  deleteTweetById(id: string) {
+    this.mainService.deleteTweetById(this.name).subscribe(data => {
+      this.ngOnInit()
+    }, error => console.log(error));
+  }
 }

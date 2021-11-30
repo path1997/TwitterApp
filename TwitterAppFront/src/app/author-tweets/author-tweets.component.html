@@ -6,6 +6,7 @@
     <th>Data utworzenia</th>
     <th>Autor</th>
     <th>Jezyk</th>
+    <th>Usuń</th>
   </tr>
   </thead>
   <tbody>
@@ -14,11 +15,9 @@
     <td> {{ tweet.createdAt }} </td>
     <td> {{ tweet.author.userName }} </td>
     <td> {{ tweet.lang }} </td>
-    <!--<td>
-      <button (click) = "showTweet(keyword.id)" class = "btn btn-info">Zobacz tweety</button>
-      &lt;!&ndash;<button (click) = "deleteEmployee(employee.id)" class = "btn btn-danger" style="margin-left: 10px"> Delete</button>
-     <button (click) = "employeeDetails(employee.id)" class = "btn btn-info" style="margin-left: 10px"> View</button>&ndash;&gt;
-    </td>-->
+    <td>
+      <button (click) = "deleteTweetById(tweet.id)" class = "btn btn-info">Usuń</button>
+    </td>
   </tr>
   </tbody>
 </table>

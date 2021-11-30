@@ -13,5 +13,6 @@ public interface TweetRepo extends CrudRepository<Tweet,Long> {
     List<Tweet> findAllByKeywordIdAndDeletedFalseOrderByCreatedAt(Long id);
     void deleteAllByKeywordId(Long id);
     List<Tweet> findAllByAuthorUserName(String name);
-
+    List<Tweet> findAllByAuthorIdAndDeletedIsFalse(Long id);
+    List<Tweet> findAllByDeletedIsTrue();
 }

@@ -7,6 +7,8 @@ import com.rzeznicki.twitterapp.Repo.TweetRepo;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -30,73 +32,114 @@ public class MainController {
     private final TweetRepo tweetRepo;
     private final KeywordRepo keywordRepo;
     private final AuthorRepo authorRepo;
+    private HttpHeaders headers = new HttpHeaders();
+    private String pattern="yyyy-MM-dd'T'HH:mm:ss.SSSS'Z'";
+    private SimpleDateFormat formatter = new SimpleDateFormat(pattern);
+    private HttpEntity entity;
+
 
     @Autowired
-    public MainController(TweetRepo tweetRepo, KeywordRepo keywordRepo, AuthorRepo authorRepo) {
+    public MainController(TweetRepo tweetRepo, KeywordRepo keywordRepo, AuthorRepo authorRepo, Environment environment) {
         this.tweetRepo = tweetRepo;
         this.keywordRepo = keywordRepo;
         this.authorRepo = authorRepo;
+        this.headers.set("Authorization", "Bearer " + environment.getProperty("baererKey"));
+        //this.headers.set("Authorization", "Bearer AAAAAAAAAAAAAAAAAAAAAOcaWAEAAAAA6xSmtCZ1h%2BsBLvkP9QnAXYnoda4%3DaW649bjaaReyDvln0IC2eSnajPivrk3CPnt8xzD1XcUhXTnNqw");
+        entity = new HttpEntity(headers);
     }
     ModelMapper modelMapper=new ModelMapper();
 
-    private Keyword getTweetsWithKeyword(String keyword) throws Exception {
-        HttpHeaders headers = new HttpHeaders();
-        String pattern="yyyy-MM-dd'T'HH:mm:ss.SSSS'Z'";
-        SimpleDateFormat formatter = new SimpleDateFormat(pattern);
-        headers.set("Authorization", "Bearer AAAAAAAAAAAAAAAAAAAAAOcaWAEAAAAA6xSmtCZ1h%2BsBLvkP9QnAXYnoda4%3DaW649bjaaReyDvln0IC2eSnajPivrk3CPnt8xzD1XcUhXTnNqw");
-        HttpEntity entity = new HttpEntity(headers);
-        int lengthTweet = 0;
-        Keyword keyword1=null;
-        List<String> keywords= Arrays.stream(keyword.split("!%")).filter(StringUtils::isNotBlank).map(String::trim).toList();
-        for(String keyword2: keywords) {
-            ResponseEntity<String> response = rest.exchange(
-                    "https://api.twitter.com/2/tweets/search/recent?query=(from:" + keyword2 + " OR " + keyword2 + ") (lang:en OR lang:pl)&expansions=author_id&tweet.fields=created_at,lang,source&max_results=100",
-                    HttpMethod.GET,
-                    entity,
-                    String.class);
-            if (response.getStatusCode().is2xxSuccessful()) {
-                System.out.println(response.getBody());
-                JSONObject jsonObj = new JSONObject(response.getBody());
-                JSONObject jsonObj1 = jsonObj.getJSONObject("includes");
-                JSONArray ja_data = jsonObj1.getJSONArray("users");
-                int length = ja_data.length();
-                for (int i = 0; i < length; i++) {
-                    JSONObject jObj = ja_data.getJSONObject(i);
-                    if (authorRepo.countAuthorById(Long.valueOf(jObj.getString("id"))) == 0) {
-                        authorRepo.save(new Author(Long.valueOf(jObj.getString("id")), jObj.getString("name"), jObj.getString("username"),false));
-                    }
-                }
-                ja_data = jsonObj.getJSONArray("data");
-                lengthTweet = ja_data.length();
-                keyword1 = new Keyword(keyword2, lengthTweet, lengthTweet);
-                int counterAdd=0;
-                keywordRepo.save(keyword1);
-                for (int i = 0; i < lengthTweet; i++) {
-                    JSONObject jObj = ja_data.getJSONObject(i);
-                    if (tweetRepo.countTweetById(Long.valueOf(jObj.getString("id"))) == 0) {
-                        counterAdd++;
-                        tweetRepo.save(new Tweet(Long.valueOf(jObj.getString("id")), formatter.parse(jObj.getString("created_at")),
-                                jObj.getString("text"), authorRepo.findById(Long.valueOf(jObj.getString("author_id"))).get(), jObj.getString("lang"), keyword1,false));
-                    }
-                }
-                keyword1.setTwitCounterLastSearch(counterAdd);
-                keyword1.setTwitCounter(counterAdd);
-                keyword1.setKeywordIsAuthor(authorRepo.existsAuthorByUserName(keyword2));
-                keywordRepo.save(keyword1);
-            } else {
-                throw new Exception("Kod błedu z api: " + response.getStatusCode().value() + "error message:" + response.getBody());
-            }
-        }
-        return keyword1;
+    @GetMapping("/keywords")
+    public List<KeywordDTO> getAllKeywords(){
+        return keywordRepo.findAll().stream().map(this::convertToDto).toList();
     }
 
-    @GetMapping("/refleshDatabase")
-    public String refleshDatabase(Model model, HttpServletRequest request) throws Exception {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer AAAAAAAAAAAAAAAAAAAAAOcaWAEAAAAA6xSmtCZ1h%2BsBLvkP9QnAXYnoda4%3DaW649bjaaReyDvln0IC2eSnajPivrk3CPnt8xzD1XcUhXTnNqw");
-        String pattern="yyyy-MM-dd'T'HH:mm:ss.SSSS'Z'";
-        SimpleDateFormat formatter = new SimpleDateFormat(pattern);
-        HttpEntity entity = new HttpEntity(headers);
+    @GetMapping("/tweets/{id}")
+    public List<TweetDTO> getAllTweetsById(@PathVariable String id){
+        return tweetRepo.findAllByKeywordIdAndDeletedFalseOrderByCreatedAt(Long.valueOf(id)).stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+
+    @PostMapping("/keywords")
+    public List<KeywordDTO> createKeyword(@RequestBody String keywordString) throws Exception {
+        return getTweetsWithKeyword(keywordString).stream().map(this::convertToDto).toList();
+    }
+
+    @Transactional
+    @PostMapping("/keyword/delete")
+    public ResponseEntity deleteKeyword(@RequestBody String id){
+        tweetRepo.deleteAllByKeywordId(Long.valueOf(id));
+        keywordRepo.deleteById(Long.valueOf(id));
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("deleted", Boolean.TRUE);
+        return ResponseEntity.ok(response);
+    }
+    @GetMapping("/tweetsByAuthorName/{name}")
+    public List<TweetDTO> getAllTweetsByAuthorName(@PathVariable String name){
+        return tweetRepo.findAllByAuthorUserName(name).stream().map(this::convertToDto).toList();
+    }
+    @Transactional
+    @PostMapping("/deleteTweet")
+    public ResponseEntity deleteTweetById(@RequestBody String id){
+        Tweet tweet = tweetRepo.findById(Long.valueOf(id)).get();
+        tweet.setDeleted(true);
+        tweetRepo.save(tweet);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("deleted", Boolean.TRUE);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/addAuthorToFavourite")
+    public AuthorDTO addAuthorToFavourite(@RequestBody String id) {
+        Author author= authorRepo.findById(Long.valueOf(id)).get();
+        author.setFavourite(true);
+        return convertToDto(authorRepo.save(author));
+    }
+
+    @GetMapping("/favouriteAuthors")
+    public List<AuthorDTO> getFavouriteAuthors(){
+        return authorRepo.findAuthorByFavouriteTrue().stream().map(this::convertToDto).toList();
+    }
+
+    @PostMapping("/favouriteAuthor/delete")
+    public ResponseEntity deleteFavouriteAuthor(@RequestBody String id){
+        Author author=authorRepo.findById(Long.valueOf(id)).get();
+        author.setFavourite(false);
+        authorRepo.save(author);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("deleted", Boolean.TRUE);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/favouriteAuthor/{id}")
+    public List<TweetDTO> getFavouriteAuthors(@PathVariable String id){
+        return tweetRepo.findAllByAuthorIdAndDeletedIsFalse(Long.valueOf(id)).stream().map(this::convertToDto).toList();
+    }
+
+    @GetMapping("/trashTweets")
+    public List<TweetDTO> getTrashTweets(){
+        return tweetRepo.findAllByDeletedIsTrue().stream().map(this::convertToDto).toList();
+    }
+
+    @PostMapping("/deleteTweetPermment")
+    public ResponseEntity deleteTweetPermament(@RequestBody String id) {
+        tweetRepo.deleteById(Long.valueOf(id));
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("deleted", Boolean.TRUE);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/revertDeletedTweet")
+    public ResponseEntity revertDeletedTweet(@RequestBody String id) {
+        Tweet tweet=tweetRepo.findById(Long.valueOf(id)).get();
+        tweet.setDeleted(false);
+        tweetRepo.save(tweet);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("reverted", Boolean.TRUE);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/refleshData")
+    public void refleshDatabase() throws Exception {
         Iterable<Keyword> keywordList=keywordRepo.findAll();
         for(Keyword keyword: keywordList) {
             ResponseEntity<String> response = rest.exchange(
@@ -105,24 +148,19 @@ public class MainController {
                     entity,
                     String.class);
             if (response.getStatusCode().is2xxSuccessful()) {
-                System.out.println(response.getBody());
                 JSONObject jsonObj = new JSONObject(response.getBody());
-                JSONObject jsonObj1 = jsonObj.getJSONObject("includes");
-                JSONArray ja_data = jsonObj1.getJSONArray("users");
-                int length = ja_data.length();
-
-                for (int i = 0; i < length; i++) {
-                    JSONObject jObj = ja_data.getJSONObject(i);
+                JSONObject jsonObjIncludes = jsonObj.getJSONObject("includes");
+                JSONArray jsonArrayUsers = jsonObjIncludes.getJSONArray("users");
+                for (int i = 0; i < jsonArrayUsers.length(); i++) {
+                    JSONObject jObj = jsonArrayUsers.getJSONObject(i);
                     if (authorRepo.countAuthorById(Long.valueOf(jObj.getString("id"))) == 0) {
                         authorRepo.save(new Author(Long.valueOf(jObj.getString("id")), jObj.getString("name"), jObj.getString("username"),false));
                     }
                 }
-                ja_data = jsonObj.getJSONArray("data");
-                length = ja_data.length();
-                System.out.println(response.getBody());
+                JSONArray jsonArrayData = jsonObj.getJSONArray("data");
                 int counterAdd=0;
-                for (int i = 0; i < length; i++) {
-                    JSONObject jObj = ja_data.getJSONObject(i);
+                for (int i = 0; i < jsonArrayData.length(); i++) {
+                    JSONObject jObj = jsonArrayData.getJSONObject(i);
                     if (tweetRepo.countTweetById(Long.valueOf(jObj.getString("id"))) == 0) {
                         counterAdd++;
                         tweetRepo.save(new Tweet(Long.valueOf(jObj.getString("id")), formatter.parse(jObj.getString("created_at")),
@@ -137,70 +175,61 @@ public class MainController {
                 throw new Exception("Kod błedu z api: " + response.getStatusCode().value() + "error message:" + response.getBody());
             }
         }
-       /* System.out.println(tweetList.getData().size());
-        System.out.println();
-        TweetV2.TweetData tweetData= tweetList.;
-        System.out.printf(tweetData);
-        Tweet*/
-        System.out.println(keywordRepo.findAll().toString());
-        return "index";
-    }
-
-    @GetMapping("/keywords")
-    public List<KeywordDTO> getAllKeywords(){
-        return keywordRepo.findAll().stream().map(this::convertToDto).toList();
-    }
-
-    @GetMapping("/tweets/{id}")
-    public List<TweetDTO> getAllTweetsById(@PathVariable Long id){
-        return tweetRepo.findAllByKeywordIdAndDeletedFalseOrderByCreatedAt(id).stream().map(this::convertToDto).collect(Collectors.toList());
-    }
-
-    @PostMapping("/keywords")
-    public KeywordDTO createEmployee(@RequestBody String keywordString) throws Exception {
-        return convertToDto(getTweetsWithKeyword(keywordString));
-    }
-
-    @Transactional
-    @PostMapping("/keyword/delete")
-    public ResponseEntity deleteKeyword(@RequestBody Long id){
-        tweetRepo.deleteAllByKeywordId(id);
-        keywordRepo.deleteById(id);
-        Map<String, Boolean> response = new HashMap<>();
-        response.put("deleted", Boolean.TRUE);
-        return ResponseEntity.ok(response);
-    }
-    @GetMapping("/tweetsByAuthorName/{name}")
-    public List<TweetDTO> getAllTweetsByAuthorName(@PathVariable String name){
-        return tweetRepo.findAllByAuthorUserName(name).stream().map(this::convertToDto).toList();
-    }
-    @Transactional
-    @PostMapping("/deleteTweet")
-    public ResponseEntity deleteTweetById(@RequestBody String id){
-        tweetRepo.deleteById(Long.valueOf(id));
-        Map<String, Boolean> response = new HashMap<>();
-        response.put("deleted", Boolean.TRUE);
-        return ResponseEntity.ok(response);
-    }
-
-    @PostMapping("/addAuthorToFavourite")
-    public AuthorDTO addAuthorToFavourite(@RequestBody String id) {
-        Author author= authorRepo.findById(Long.valueOf(id)).get();
-        author.setFavourite(true);
-        return convertToDto(authorRepo.save(author));
     }
 
     private TweetDTO convertToDto(Tweet tweet) {
-        TweetDTO tweetDTO = modelMapper.map(tweet, TweetDTO.class);
-        return tweetDTO;
+        return modelMapper.map(tweet, TweetDTO.class);
     }
     private AuthorDTO convertToDto(Author author) {
-        AuthorDTO authorDTO = modelMapper.map(author, AuthorDTO.class);
-        return authorDTO;
+        return modelMapper.map(author, AuthorDTO.class);
     }
     private KeywordDTO convertToDto(Keyword keyword) {
-        KeywordDTO keywordDTO = modelMapper.map(keyword, KeywordDTO.class);
-        return keywordDTO;
+        return modelMapper.map(keyword, KeywordDTO.class);
+    }
+
+    private List<Keyword> getTweetsWithKeyword(String keyword) throws Exception {
+        Keyword keywordToSave;
+        List<Keyword> keywordsToReturn=new ArrayList<>();
+        List<String> keywords= Arrays.stream(keyword.split("!%")).filter(StringUtils::isNotBlank).map(String::trim).toList();
+        for(String keywordFromString: keywords) {
+            ResponseEntity<String> response = rest.exchange(
+                    "https://api.twitter.com/2/tweets/search/recent?query=(from:" + keywordFromString + " OR " + keywordFromString + ") (lang:en OR lang:pl)&expansions=author_id&tweet.fields=created_at,lang,source&max_results=100",
+                    HttpMethod.GET,
+                    entity,
+                    String.class);
+            if (response.getStatusCode().is2xxSuccessful()) {
+                JSONObject jsonObj = new JSONObject(response.getBody());
+                JSONObject jsonObjIncludes = jsonObj.getJSONObject("includes");
+                JSONArray jsonArrayUsers = jsonObjIncludes.getJSONArray("users");
+                for (int i = 0; i < jsonArrayUsers.length(); i++) {
+                    JSONObject jObj = jsonArrayUsers.getJSONObject(i);
+                    if (authorRepo.countAuthorById(Long.valueOf(jObj.getString("id"))) == 0) {
+                        authorRepo.save(new Author(Long.valueOf(jObj.getString("id")), jObj.getString("name"), jObj.getString("username"),false));
+                    }
+                }
+                JSONArray jsonArrayData = jsonObj.getJSONArray("data");
+                int lengthTweet = jsonArrayData.length();
+                keywordToSave = new Keyword(keywordFromString, lengthTweet, lengthTweet);
+                int counterAdd=0;
+                keywordRepo.save(keywordToSave);
+                for (int i = 0; i < lengthTweet; i++) {
+                    JSONObject jObj = jsonArrayData.getJSONObject(i);
+                    if (tweetRepo.countTweetById(Long.valueOf(jObj.getString("id"))) == 0) {
+                        counterAdd++;
+                        tweetRepo.save(new Tweet(Long.valueOf(jObj.getString("id")), formatter.parse(jObj.getString("created_at")),
+                                jObj.getString("text"), authorRepo.findById(Long.valueOf(jObj.getString("author_id"))).get(), jObj.getString("lang"), keywordToSave,false));
+                    }
+                }
+                keywordToSave.setTwitCounterLastSearch(counterAdd);
+                keywordToSave.setTwitCounter(counterAdd);
+                keywordToSave.setKeywordIsAuthor(authorRepo.existsAuthorByUserName(keywordFromString));
+                keywordRepo.save(keywordToSave);
+                keywordsToReturn.add(keywordToSave);
+            } else {
+                throw new Exception("Kod błedu z api: " + response.getStatusCode().value() + "error message:" + response.getBody());
+            }
+        }
+        return keywordsToReturn;
     }
 
 }

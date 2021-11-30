@@ -10,7 +10,7 @@
   <tbody>
   <tr *ngFor = "let author of authors" >
     <td> {{ author.id }} </td>
-    <td> {{ author.username }} </td>
+    <td> {{ author.userName }} </td>
     <td>
       <button (click) = "showFavouriteAuthorTweets(author.id)" class = "btn btn-info">Zobacz tweety</button>
       <button (click) = "deleteFavouriteAuthor(author.id)" class = "btn btn-info">Usuń</button>

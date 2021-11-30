@@ -42,4 +42,28 @@ export class MainService {
   getFavouriteAuthors() :Observable<Author[]>{
     return this.httpClient.get<Author[]>(`${this.baseURL}/favouriteAuthors`);
   }
+
+  deleteFavouriteAuthor(id: string) :Observable<Object>{
+    return this.httpClient.post(`${this.baseURL}/favouriteAuthor/delete`,id);
+  }
+
+  getTweetsByAuthorId(id: string) :Observable<Tweet[]>{
+    return this.httpClient.get<Tweet[]>(`${this.baseURL}/favouriteAuthor/${id}`);
+  }
+
+  getDeletedList() :Observable<Tweet[]> {
+    return this.httpClient.get<Tweet[]>(`${this.baseURL}/trashTweets`)
+  }
+
+  deletePermamentTweetById(id: string) :Observable<Object>{
+    return this.httpClient.post(`${this.baseURL}/deleteTweetPermment`,id);
+  }
+
+  revertDeleteTweetById(id: string) :Observable<Object>{
+    return this.httpClient.post(`${this.baseURL}/revertDeletedTweet`,id);
+  }
+
+  refleshData() :Observable<Object>{
+    return this.httpClient.get(`${this.baseURL}/refleshData`)
+  }
 }

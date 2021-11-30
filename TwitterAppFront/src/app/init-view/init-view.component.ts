@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import {MainService} from "../main.service";
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-init-view',
@@ -7,9 +9,17 @@ import { Component, OnInit } from '@angular/core';
 })
 export class InitViewComponent implements OnInit {
 
-  constructor() { }
+  constructor(private mainService: MainService,
+              private router: Router) { }
 
   ngOnInit(): void {
   }
 
+  refleshData() {
+    this.mainService.refleshData().subscribe(data =>{
+        console.log(data);
+        this.ngOnInit()
+      },
+      error => console.log(error))
+  }
 }

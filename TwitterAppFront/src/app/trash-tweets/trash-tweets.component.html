@@ -1,1 +1,24 @@
-<p>trash-tweets works!</p>
+<h2>Tweety</h2>
+<table class = "table table-striped">
+  <thead>
+  <tr>
+    <th>Treść</th>
+    <th>Data utworzenia</th>
+    <th>Autor</th>
+    <th>Jezyk</th>
+    <th>Usuń</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor = "let tweet of tweets" id="tweet-{{tweet.id}}">
+    <td> {{ tweet.text }} </td>
+    <td> {{ tweet.createdAt }} </td>
+    <td> <a (click) = "addAuthorToFavorite(tweet.author.id)" style="color: blue; text-decoration: underline;">{{ tweet.author.userName }}</a> </td>
+    <td> {{ tweet.lang }} </td>
+    <td>
+      <button (click) = "deletePermamentTweetById(tweet.id)" class = "btn btn-info">Usuń</button>
+      <button (click) = "revertDeleteTweetById(tweet.id)" class = "btn btn-info">Przywróć</button>
+    </td>
+  </tr>
+  </tbody>
+</table>

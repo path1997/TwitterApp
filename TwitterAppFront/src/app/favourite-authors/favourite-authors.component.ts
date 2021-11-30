@@ -21,10 +21,14 @@ export class FavouriteAuthorsComponent implements OnInit {
   }
 
   showFavouriteAuthorTweets(id: string) {
-
+    this.router.navigate(['favouriteAuthorsTweets',id]);
   }
 
   deleteFavouriteAuthor(id: string) {
-
+    this.mainService.deleteFavouriteAuthor(id).subscribe(data =>{
+        console.log(data);
+        this.ngOnInit()
+      },
+      error => console.log(error))
   }
 }
