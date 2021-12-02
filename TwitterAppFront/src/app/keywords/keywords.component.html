@@ -1,12 +1,14 @@
-<h2>Słowa kluczowe</h2>
+<h1 class="mt-3 mb-3 text-center">Słowa kluczowe</h1>
+
 <form (ngSubmit) = "onSubmit()">
-  <div class="form-group">
-    <label>Dodaj słowo klucz</label>
+    <label for="keyword">Dodaj słowo klucz</label>
     <input type="text" class ="form-control" id = "keyword"
            [(ngModel)] = "keyword.name" name = "keyword">
-  </div>
+  <div class="d-grid gap-2 mb-5">
   <button class = "btn btn-success" type ="submit">Dodaj</button>
+  </div>
 </form>
+
 <table class = "table table-striped">
   <thead>
   <tr>
@@ -22,11 +24,9 @@
     <td> {{ keyword.twitCounter }} </td>
     <td> {{ keyword.twitCounterLastSearch }} </td>
     <td>
-      <button (click) = "showTweet(keyword.id)" class = "btn btn-info">Zobacz tweety</button>
-      <button *ngIf="keyword.keywordIsAuthor" (click) = "showTweetByAuthor(keyword.name)" class = "btn btn-info">Zobacz autorów</button>
-      <button (click) = "deleteKeyword(keyword.id)" class = "btn btn-info">Usuń</button>
-      <!--<button (click) = "deleteEmployee(employee.id)" class = "btn btn-danger" style="margin-left: 10px"> Delete</button>
-     <button (click) = "employeeDetails(employee.id)" class = "btn btn-info" style="margin-left: 10px"> View</button>-->
+      <button style="margin-right: 10px;" (click) = "showTweet(keyword.id)" class = "btn btn-info">Zobacz tweety</button>
+      <button style="margin-right: 10px;" *ngIf="keyword.keywordIsAuthor" (click) = "showTweetByAuthor(keyword.name)" class = "btn btn-info">Zobacz autorów</button>
+      <button style="margin-right: 10px;" (click) = "deleteKeyword(keyword.id, keyword.name)" class = "btn btn-info">Usuń</button>
     </td>
   </tr>
   </tbody>

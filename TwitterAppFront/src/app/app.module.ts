@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http'
 
@@ -12,6 +12,13 @@ import { AuthorTweetsComponent } from './author-tweets/author-tweets.component';
 import { TrashTweetsComponent } from './trash-tweets/trash-tweets.component';
 import { FavouriteAuthorsComponent } from './favourite-authors/favourite-authors.component';
 import { FavouriteAuthorTweetsComponent } from './favourite-author-tweets/favourite-author-tweets.component';
+import {
+  NgxAwesomePopupModule,
+  DialogConfigModule,
+  ConfirmBoxConfigModule,
+  ToastNotificationConfigModule
+} from '@costlydeveloper/ngx-awesome-popup';
+import { NgxSpinnerModule } from "ngx-spinner";
 
 @NgModule({
   declarations: [
@@ -28,8 +35,14 @@ import { FavouriteAuthorTweetsComponent } from './favourite-author-tweets/favour
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    NgxAwesomePopupModule.forRoot(),
+    DialogConfigModule.forRoot(),
+    ConfirmBoxConfigModule.forRoot(),
+    ToastNotificationConfigModule.forRoot(),
+    NgxSpinnerModule
   ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [],
   bootstrap: [AppComponent]
 })

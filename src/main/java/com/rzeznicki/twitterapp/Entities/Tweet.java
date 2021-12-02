@@ -5,7 +5,7 @@ import org.springframework.data.annotation.Id;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
+
 @Entity
 @Table(name = "tweets")
 public class Tweet {
@@ -105,16 +105,4 @@ public class Tweet {
         this.keyword = keyword;
     }
 
-    @Override
-    public String toString() {
-        return "Tweet{" +
-                "id=" + id +
-                ", createdAt=" + createdAt +
-                ", text='" + text + '\'' +
-                ", author=" + author +
-                ", lang='" + lang + '\'' +
-                ", keyword=" + keyword +
-                ", deleted=" + deleted +
-                '}';
-    }
 }

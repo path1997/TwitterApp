@@ -7,19 +7,16 @@ import com.rzeznicki.twitterapp.Repo.TweetRepo;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import twitter4j.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -44,7 +41,6 @@ public class MainController {
         this.keywordRepo = keywordRepo;
         this.authorRepo = authorRepo;
         this.headers.set("Authorization", "Bearer " + environment.getProperty("baererKey"));
-        //this.headers.set("Authorization", "Bearer AAAAAAAAAAAAAAAAAAAAAOcaWAEAAAAA6xSmtCZ1h%2BsBLvkP9QnAXYnoda4%3DaW649bjaaReyDvln0IC2eSnajPivrk3CPnt8xzD1XcUhXTnNqw");
         entity = new HttpEntity(headers);
     }
     ModelMapper modelMapper=new ModelMapper();
@@ -56,7 +52,7 @@ public class MainController {
 
     @GetMapping("/tweets/{id}")
     public List<TweetDTO> getAllTweetsById(@PathVariable String id){
-        return tweetRepo.findAllByKeywordIdAndDeletedFalseOrderByCreatedAt(Long.valueOf(id)).stream().map(this::convertToDto).collect(Collectors.toList());
+        return tweetRepo.findAllByKeywordIdAndDeletedFalseOrderByCreatedAtDesc(Long.valueOf(id)).stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
     @PostMapping("/keywords")
@@ -75,7 +71,7 @@ public class MainController {
     }
     @GetMapping("/tweetsByAuthorName/{name}")
     public List<TweetDTO> getAllTweetsByAuthorName(@PathVariable String name){
-        return tweetRepo.findAllByAuthorUserName(name).stream().map(this::convertToDto).toList();
+        return tweetRepo.findAllByAuthorUserNameAndDeletedFalseOrderByCreatedAtDesc(name).stream().map(this::convertToDto).toList();
     }
     @Transactional
     @PostMapping("/deleteTweet")
@@ -89,9 +85,10 @@ public class MainController {
     }
 
     @PostMapping("/addAuthorToFavourite")
-    public AuthorDTO addAuthorToFavourite(@RequestBody String id) {
+    public AuthorDTO addAuthorToFavourite(@RequestBody String id) throws Exception {
         Author author= authorRepo.findById(Long.valueOf(id)).get();
         author.setFavourite(true);
+        getTweetsByAuthorId(id);
         return convertToDto(authorRepo.save(author));
     }
 
@@ -100,9 +97,11 @@ public class MainController {
         return authorRepo.findAuthorByFavouriteTrue().stream().map(this::convertToDto).toList();
     }
 
+    @Transactional
     @PostMapping("/favouriteAuthor/delete")
     public ResponseEntity deleteFavouriteAuthor(@RequestBody String id){
         Author author=authorRepo.findById(Long.valueOf(id)).get();
+        tweetRepo.deleteAllByAuthor_IdAndAuthorFavourite(author.getId(),true);
         author.setFavourite(false);
         authorRepo.save(author);
         Map<String, Boolean> response = new HashMap<>();
@@ -112,12 +111,12 @@ public class MainController {
 
     @GetMapping("/favouriteAuthor/{id}")
     public List<TweetDTO> getFavouriteAuthors(@PathVariable String id){
-        return tweetRepo.findAllByAuthorIdAndDeletedIsFalse(Long.valueOf(id)).stream().map(this::convertToDto).toList();
+        return tweetRepo.findAllByAuthorIdAndDeletedIsFalseOrderByCreatedAtDesc(Long.valueOf(id)).stream().map(this::convertToDto).toList();
     }
 
     @GetMapping("/trashTweets")
     public List<TweetDTO> getTrashTweets(){
-        return tweetRepo.findAllByDeletedIsTrue().stream().map(this::convertToDto).toList();
+        return tweetRepo.findAllByDeletedIsTrueOrderByCreatedAtDesc().stream().map(this::convertToDto).toList();
     }
 
     @PostMapping("/deleteTweetPermment")
@@ -163,8 +162,12 @@ public class MainController {
                     JSONObject jObj = jsonArrayData.getJSONObject(i);
                     if (tweetRepo.countTweetById(Long.valueOf(jObj.getString("id"))) == 0) {
                         counterAdd++;
-                        tweetRepo.save(new Tweet(Long.valueOf(jObj.getString("id")), formatter.parse(jObj.getString("created_at")),
-                                jObj.getString("text"), authorRepo.findById(Long.valueOf(jObj.getString("author_id"))).get(), jObj.getString("lang"), keywordRepo.findById(Long.valueOf("1")).get(),false));
+                        tweetRepo.save(new Tweet(Long.valueOf(jObj.getString("id")),
+                                formatter.parse(jObj.getString("created_at")),
+                                jObj.getString("text"),
+                                authorRepo.findById(Long.valueOf(jObj.getString("author_id"))).get(),
+                                jObj.getString("lang"), keywordRepo.findById(keyword.getId()).get(),
+                                false));
                     }
                 }
                 keyword.setTwitCounterLastSearch(counterAdd);
@@ -173,6 +176,9 @@ public class MainController {
                 keywordRepo.save(keyword);
             } else {
                 throw new Exception("Kod błedu z api: " + response.getStatusCode().value() + "error message:" + response.getBody());
+            }
+            for(Author author: authorRepo.findAuthorByFavouriteTrue()){
+                getTweetsByAuthorId(String.valueOf(author.getId()));
             }
         }
     }
@@ -216,8 +222,13 @@ public class MainController {
                     JSONObject jObj = jsonArrayData.getJSONObject(i);
                     if (tweetRepo.countTweetById(Long.valueOf(jObj.getString("id"))) == 0) {
                         counterAdd++;
-                        tweetRepo.save(new Tweet(Long.valueOf(jObj.getString("id")), formatter.parse(jObj.getString("created_at")),
-                                jObj.getString("text"), authorRepo.findById(Long.valueOf(jObj.getString("author_id"))).get(), jObj.getString("lang"), keywordToSave,false));
+                        tweetRepo.save(new Tweet(Long.valueOf(jObj.getString("id")),
+                                formatter.parse(jObj.getString("created_at")),
+                                jObj.getString("text"),
+                                authorRepo.findById(Long.valueOf(jObj.getString("author_id"))).get(),
+                                jObj.getString("lang"),
+                                keywordToSave,
+                                false));
                     }
                 }
                 keywordToSave.setTwitCounterLastSearch(counterAdd);
@@ -230,6 +241,33 @@ public class MainController {
             }
         }
         return keywordsToReturn;
+    }
+
+    private void getTweetsByAuthorId(String authorId) throws Exception {
+        ResponseEntity<String> response = rest.exchange(
+                "https://api.twitter.com/2/tweets/search/recent?query=from:" + authorId + " (lang:en OR lang:pl)&expansions=author_id&tweet.fields=created_at,lang,source&max_results=100",
+                HttpMethod.GET,
+                entity,
+                String.class);
+        if (response.getStatusCode().is2xxSuccessful()) {
+            JSONObject jsonObj = new JSONObject(response.getBody());
+            JSONArray jsonArrayData = jsonObj.getJSONArray("data");
+            int lengthTweet = jsonArrayData.length();
+            for (int i = 0; i < lengthTweet; i++) {
+                JSONObject jObj = jsonArrayData.getJSONObject(i);
+                if (tweetRepo.countTweetById(Long.valueOf(jObj.getString("id"))) == 0) {
+                    tweetRepo.save(new Tweet(Long.valueOf(jObj.getString("id")),
+                            formatter.parse(jObj.getString("created_at")),
+                            jObj.getString("text"),
+                            authorRepo.findById(Long.valueOf(jObj.getString("author_id"))).get(),
+                            jObj.getString("lang"),
+                            null,
+                            false));
+                }
+            }
+        } else {
+            throw new Exception("Kod błedu z api: " + response.getStatusCode().value() + "error message:" + response.getBody());
+        }
     }
 
 }

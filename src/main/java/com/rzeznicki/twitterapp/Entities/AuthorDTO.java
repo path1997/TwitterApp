@@ -1,8 +1,5 @@
 package com.rzeznicki.twitterapp.Entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import javax.persistence.OneToMany;
 import java.util.List;
 
 public class AuthorDTO {

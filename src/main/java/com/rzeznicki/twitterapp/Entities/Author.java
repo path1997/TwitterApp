@@ -1,11 +1,9 @@
 package com.rzeznicki.twitterapp.Entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Id;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.util.List;
