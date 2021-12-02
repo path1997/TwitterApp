@@ -3,7 +3,6 @@ services:
 
   db:
     image: mysql:8.0.27
-    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: zaq1@WSX
       MYSQL_DATABASE: TwitterDb
@@ -14,26 +13,20 @@ services:
 
   phpmyadmin:
     image: phpmyadmin:5.1
-    restart: always
     ports:
       - 8081:80
 
-  backend:
-    image: openjdk:16-jdk-slim
+  twitter-app-backend:
     restart: always
-    environment:
-      baererKey: AAAAAAAAAAAAAAAAAAAAAOcaWAEAAAAA6xSmtCZ1h%2BsBLvkP9QnAXYnoda4%3DaW649bjaaReyDvln0IC2eSnajPivrk3CPnt8xzD1XcUhXTnNqw
+    build:
+      context: TwitterAppBackend
+      dockerfile: Dockerfile
+      args:
+        passwordToDbArg: "zaq1@WSX"
+        baererKeyArg: "AAAAAAAAAAAAAAAAAAAAAOcaWAEAAAAA6xSmtCZ1h%2BsBLvkP9QnAXYnoda4%3DaW649bjaaReyDvln0IC2eSnajPivrk3CPnt8xzD1XcUhXTnNqw"
+    image: twitter-app-backend:latest
     ports:
       - 8080:8080
-    command:
-      bash -c "java -jar /target/TwitterApp-0.0.1-SNAPSHOT.jar"
-
-  front:
-    image: node:16
-    ports:
-      - 4200:4200
-    command:
-      bash -c "cd TwitterAppFront && npm install && ng serve --host 0.0.0.0 --port 4200"
 
 networks:
   default:

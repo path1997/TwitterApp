@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.rzeznicki</groupId>
-    <artifactId>TwitterApp</artifactId>
+    <artifactId>TwitterAppBackend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>TwitterApp</name>
-    <description>TwitterApp</description>
+    <name>TwitterAppBackend</name>
+    <description>TwitterAppBackend</description>
     <properties>
         <java.version>16</java.version>
     </properties>
