@@ -1,22 +1,26 @@
 version: '3.1'
 services:
 
-  db:
+  mysql:
+    container_name: twitter-app-mysql
     image: mysql:8.0.27
     environment:
       MYSQL_ROOT_PASSWORD: zaq1@WSX
       MYSQL_DATABASE: TwitterDb
-    ports:
-      - 3306:3306
     volumes:
       - db:/var/lib/mysql
 
   phpmyadmin:
+    container_name: twitter-app-phpmyadmin
     image: phpmyadmin:5.1
     ports:
       - 8081:80
+    environment:
+      - PMA_HOST=twitter-app-mysql
+      - PMA_PORT=3306
 
-  twitter-app-backend:
+  backend:
+    container_name: twitter-app-backend
     restart: always
     build:
       context: TwitterAppBackend
@@ -24,9 +28,14 @@ services:
       args:
         passwordToDbArg: "zaq1@WSX"
         baererKeyArg: "AAAAAAAAAAAAAAAAAAAAAOcaWAEAAAAA6xSmtCZ1h%2BsBLvkP9QnAXYnoda4%3DaW649bjaaReyDvln0IC2eSnajPivrk3CPnt8xzD1XcUhXTnNqw"
-    image: twitter-app-backend:latest
+
+  front:
+    container_name: twitter-app-front
+    build:
+      context: TwitterAppFront
+      dockerfile: Dockerfile
     ports:
-      - 8080:8080
+      - 4200:80
 
 networks:
   default:

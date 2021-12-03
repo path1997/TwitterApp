@@ -10,7 +10,7 @@ import {Author} from "./author";
 })
 export class MainService {
 
-  private baseURL = "http://localhost:8080/api/v1";
+  private baseURL = "http://twitter-app-backend:8080/api/v1";
   constructor(private httpClient: HttpClient) { }
 
   getKeywordsList() :Observable<Keyword[]>{
