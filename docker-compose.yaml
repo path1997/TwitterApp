@@ -28,8 +28,6 @@ services:
       args:
         passwordToDbArg: "zaq1@WSX"
         baererKeyArg: "AAAAAAAAAAAAAAAAAAAAAOcaWAEAAAAA6xSmtCZ1h%2BsBLvkP9QnAXYnoda4%3DaW649bjaaReyDvln0IC2eSnajPivrk3CPnt8xzD1XcUhXTnNqw"
-    ports:
-      - 8080:8080
 
   front:
     container_name: twitter-app-front

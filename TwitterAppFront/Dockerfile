@@ -7,6 +7,7 @@ COPY . /app/
 RUN npm run build --prod
 
 FROM nginx:1.21.4
+COPY default.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist/TwitterAppFront /usr/share/nginx/html
 EXPOSE 4200:80
 

@@ -21,9 +21,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@CrossOrigin(origins = "http://localhost:4200")
 @RestController
-@RequestMapping("/api/v1/")
+@RequestMapping("/v1/")
 public class MainController {
     private final RestTemplate rest = new RestTemplate();
     private final TweetRepo tweetRepo;
