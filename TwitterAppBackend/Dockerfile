@@ -9,8 +9,16 @@ FROM openjdk:16-jdk-slim
 RUN mkdir -p /app
 COPY --from=build /app/target/TwitterAppBackend-0.0.1.jar /app/TwitterAppBackend.jar
 EXPOSE 8080
+ARG dbAdressArg
+ENV dbAdress=$dbAdressArg
+ARG dbPortArg
+ENV dbPort=$dbPortArg
+ARG loginToDbArg
+ENV loginToDb=$loginToDbArg
 ARG passwordToDbArg
 ENV passwordToDb=$passwordToDbArg
+ARG databaseNameArg
+ENV databaseName=$databaseNameArg
 ARG baererKeyArg
 ENV baererKey=$baererKeyArg
 ENTRYPOINT ["java","-jar","/app/TwitterAppBackend.jar"]

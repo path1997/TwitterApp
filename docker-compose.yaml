@@ -26,6 +26,10 @@ services:
       context: TwitterAppBackend
       dockerfile: Dockerfile
       args:
+        dbAdressArg: "twitter-app-mysql"
+        dbPortArg: "3306"
+        databaseNameArg: "TwitterDb"
+        loginToDbArg: "root"
         passwordToDbArg: "zaq1@WSX"
         baererKeyArg: "AAAAAAAAAAAAAAAAAAAAAOcaWAEAAAAA6xSmtCZ1h%2BsBLvkP9QnAXYnoda4%3DaW649bjaaReyDvln0IC2eSnajPivrk3CPnt8xzD1XcUhXTnNqw"
 
