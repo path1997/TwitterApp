@@ -54,8 +54,26 @@ export class TweetsComponent implements OnInit {
         });
 
         newToastNotification.openToastNotification$();
-      },
-      error => console.log(error))
+      }, error => {
+      this.spinner.hide();
+      const newToastNotification = new ToastNotificationInitializer();
+
+      newToastNotification.setTitle('Błąd');
+      newToastNotification.setMessage('Błąd po stronie backendu, więcej informacji w logach');
+
+      newToastNotification.setConfig({
+        AutoCloseDelay: 4000,
+        TextPosition: 'center',
+        LayoutType: DialogLayoutDisplay.DANGER,
+        ProgressBar: ToastProgressBarEnum.INCREASE,
+        ToastUserViewType: ToastUserViewTypeEnum.SIMPLE,
+        AnimationIn: AppearanceAnimation.BOUNCE_IN,
+        AnimationOut: DisappearanceAnimation.BOUNCE_OUT,
+        ToastPosition: ToastPositionEnum.BOTTOM_RIGHT,
+      });
+
+      newToastNotification.openToastNotification$();
+    });
   }
 
   deleteTweetById(id: string) {
@@ -79,7 +97,25 @@ export class TweetsComponent implements OnInit {
         });
         newToastNotification.openToastNotification$();
         this.ngOnInit()
-      },
-      error => console.log(error))
+      }, error => {
+      this.spinner.hide();
+      const newToastNotification = new ToastNotificationInitializer();
+
+      newToastNotification.setTitle('Błąd');
+      newToastNotification.setMessage('Błąd po stronie backendu, więcej informacji w logach');
+
+      newToastNotification.setConfig({
+        AutoCloseDelay: 4000,
+        TextPosition: 'center',
+        LayoutType: DialogLayoutDisplay.DANGER,
+        ProgressBar: ToastProgressBarEnum.INCREASE,
+        ToastUserViewType: ToastUserViewTypeEnum.SIMPLE,
+        AnimationIn: AppearanceAnimation.BOUNCE_IN,
+        AnimationOut: DisappearanceAnimation.BOUNCE_OUT,
+        ToastPosition: ToastPositionEnum.BOTTOM_RIGHT,
+      });
+
+      newToastNotification.openToastNotification$();
+    });
   }
 }

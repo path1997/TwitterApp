@@ -30,7 +30,26 @@ export class AuthorTweetsComponent implements OnInit {
     this.mainService.getTweetsByAuthorName(this.name).subscribe(data => {
       this.tweets = data;
       this.spinner.hide();
-    }, error => console.log(error));
+    }, error => {
+      this.spinner.hide();
+      const newToastNotification = new ToastNotificationInitializer();
+
+      newToastNotification.setTitle('Błąd');
+      newToastNotification.setMessage('Błąd po stronie backendu, więcej informacji w logach');
+
+      newToastNotification.setConfig({
+        AutoCloseDelay: 4000,
+        TextPosition: 'center',
+        LayoutType: DialogLayoutDisplay.DANGER,
+        ProgressBar: ToastProgressBarEnum.INCREASE,
+        ToastUserViewType: ToastUserViewTypeEnum.SIMPLE,
+        AnimationIn: AppearanceAnimation.BOUNCE_IN,
+        AnimationOut: DisappearanceAnimation.BOUNCE_OUT,
+        ToastPosition: ToastPositionEnum.BOTTOM_RIGHT,
+      });
+
+      newToastNotification.openToastNotification$();
+    });
   }
 
   deleteTweetById(id: string) {
@@ -54,30 +73,68 @@ export class AuthorTweetsComponent implements OnInit {
       });
       newToastNotification.openToastNotification$();
       this.ngOnInit()
-    }, error => console.log(error));
+    }, error => {
+      this.spinner.hide();
+      const newToastNotification = new ToastNotificationInitializer();
+
+      newToastNotification.setTitle('Błąd');
+      newToastNotification.setMessage('Błąd po stronie backendu, więcej informacji w logach');
+
+      newToastNotification.setConfig({
+        AutoCloseDelay: 4000,
+        TextPosition: 'center',
+        LayoutType: DialogLayoutDisplay.DANGER,
+        ProgressBar: ToastProgressBarEnum.INCREASE,
+        ToastUserViewType: ToastUserViewTypeEnum.SIMPLE,
+        AnimationIn: AppearanceAnimation.BOUNCE_IN,
+        AnimationOut: DisappearanceAnimation.BOUNCE_OUT,
+        ToastPosition: ToastPositionEnum.BOTTOM_RIGHT,
+      });
+
+      newToastNotification.openToastNotification$();
+    });
   }
+
   addAuthorToFavorite(id: string, username: string) {
     this.spinner.show();
-    this.mainService.addAuthorToFavourite(id).subscribe(data =>{
-        this.spinner.hide();
-        const newToastNotification = new ToastNotificationInitializer();
+    this.mainService.addAuthorToFavourite(id).subscribe(data => {
+      this.spinner.hide();
+      const newToastNotification = new ToastNotificationInitializer();
 
-        newToastNotification.setTitle('Autor');
-        newToastNotification.setMessage('Dodano autora '+username + ' do ulubionych');
+      newToastNotification.setTitle('Autor');
+      newToastNotification.setMessage('Dodano autora ' + username + ' do ulubionych');
 
-        newToastNotification.setConfig({
-          AutoCloseDelay: 4000,
-          TextPosition: 'center',
-          LayoutType: DialogLayoutDisplay.SUCCESS,
-          ProgressBar: ToastProgressBarEnum.INCREASE,
-          ToastUserViewType: ToastUserViewTypeEnum.SIMPLE,
-          AnimationIn: AppearanceAnimation.BOUNCE_IN,
-          AnimationOut: DisappearanceAnimation.BOUNCE_OUT,
-          ToastPosition: ToastPositionEnum.BOTTOM_RIGHT,
-        });
+      newToastNotification.setConfig({
+        AutoCloseDelay: 4000,
+        TextPosition: 'center',
+        LayoutType: DialogLayoutDisplay.SUCCESS,
+        ProgressBar: ToastProgressBarEnum.INCREASE,
+        ToastUserViewType: ToastUserViewTypeEnum.SIMPLE,
+        AnimationIn: AppearanceAnimation.BOUNCE_IN,
+        AnimationOut: DisappearanceAnimation.BOUNCE_OUT,
+        ToastPosition: ToastPositionEnum.BOTTOM_RIGHT,
+      });
 
-        newToastNotification.openToastNotification$();
-      },
-      error => console.log(error))
+      newToastNotification.openToastNotification$();
+    }, error => {
+      this.spinner.hide();
+      const newToastNotification = new ToastNotificationInitializer();
+
+      newToastNotification.setTitle('Błąd');
+      newToastNotification.setMessage('Błąd po stronie backendu, więcej informacji w logach');
+
+      newToastNotification.setConfig({
+        AutoCloseDelay: 4000,
+        TextPosition: 'center',
+        LayoutType: DialogLayoutDisplay.DANGER,
+        ProgressBar: ToastProgressBarEnum.INCREASE,
+        ToastUserViewType: ToastUserViewTypeEnum.SIMPLE,
+        AnimationIn: AppearanceAnimation.BOUNCE_IN,
+        AnimationOut: DisappearanceAnimation.BOUNCE_OUT,
+        ToastPosition: ToastPositionEnum.BOTTOM_RIGHT,
+      });
+
+      newToastNotification.openToastNotification$();
+    });
   }
 }
