@@ -12,6 +12,17 @@ public class KeywordDTO {
     private int twitCounterLastSearch;
     private boolean keywordIsAuthor;
 
+    public KeywordDTO() {
+    }
+
+    public KeywordDTO(String id, String name, int twitCounter, int twitCounterLastSearch, boolean keywordIsAuthor) {
+        this.id = id;
+        this.name = name;
+        this.twitCounter = twitCounter;
+        this.twitCounterLastSearch = twitCounterLastSearch;
+        this.keywordIsAuthor = keywordIsAuthor;
+    }
+
     public String getId() {
         return id;
     }
@@ -50,5 +61,16 @@ public class KeywordDTO {
 
     public void setKeywordIsAuthor(boolean keywordIsAuthor) {
         this.keywordIsAuthor = keywordIsAuthor;
+    }
+
+    @Override
+    public String toString() {
+        return "KeywordDTO{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", twitCounter=" + twitCounter +
+                ", twitCounterLastSearch=" + twitCounterLastSearch +
+                ", keywordIsAuthor=" + keywordIsAuthor +
+                '}';
     }
 }

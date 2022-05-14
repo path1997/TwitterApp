@@ -105,4 +105,16 @@ public class Tweet {
         this.keyword = keyword;
     }
 
+    @Override
+    public String toString() {
+        return "Tweet{" +
+                "id=" + id +
+                ", createdAt=" + createdAt +
+                ", text='" + text + '\'' +
+                ", author=" + author +
+                ", lang='" + lang + '\'' +
+                ", keyword=" + keyword +
+                ", deleted=" + deleted +
+                '}';
+    }
 }

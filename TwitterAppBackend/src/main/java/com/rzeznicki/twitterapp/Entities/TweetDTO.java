@@ -12,6 +12,18 @@ public class TweetDTO {
     @JsonIgnoreProperties(value = {"tweets"})
     private KeywordDTO keyword;
 
+    public TweetDTO() {
+    }
+
+    public TweetDTO(String id, String createdAt, String text, AuthorDTO author, String lang, KeywordDTO keyword) {
+        this.id = id;
+        this.createdAt = createdAt;
+        this.text = text;
+        this.author = author;
+        this.lang = lang;
+        this.keyword = keyword;
+    }
+
     public String getId() {
         return id;
     }
@@ -58,5 +70,17 @@ public class TweetDTO {
 
     public void setKeyword(KeywordDTO keyword) {
         this.keyword = keyword;
+    }
+
+    @Override
+    public String toString() {
+        return "TweetDTO{" +
+                "id='" + id + '\'' +
+                ", createdAt='" + createdAt + '\'' +
+                ", text='" + text + '\'' +
+                ", author=" + author +
+                ", lang='" + lang + '\'' +
+                ", keyword=" + keyword +
+                '}';
     }
 }

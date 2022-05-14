@@ -79,4 +79,15 @@ public class Keyword {
         this.tweets = tweets;
     }
 
+    @Override
+    public String toString() {
+        return "Keyword{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", twitCounter=" + twitCounter +
+                ", twitCounterLastSearch=" + twitCounterLastSearch +
+                ", keywordIsAuthor=" + keywordIsAuthor +
+                ", tweets=" + tweets +
+                '}';
+    }
 }

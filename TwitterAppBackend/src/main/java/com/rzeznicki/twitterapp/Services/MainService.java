@@ -13,36 +13,121 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
+@Service
 public class MainService {
     public final RestTemplate rest;
-    private final TweetRepo tweetRepo;
-    private final KeywordRepo keywordRepo;
-    private final AuthorRepo authorRepo;
-    private HttpHeaders headers = new HttpHeaders();
-    private String pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSS'Z'";
-    private SimpleDateFormat formatter = new SimpleDateFormat(pattern);
-    private HttpEntity entity;
-    private String urlToTwitterApi = "https://api.twitter.com/2/tweets/search/recent?query=";
-    private ObjectMapper objectMapper;
-    private ModelMapper modelMapper;
+    public final TweetRepo tweetRepo;
+    public final KeywordRepo keywordRepo;
+    public final AuthorRepo authorRepo;
+    public HttpHeaders headers = new HttpHeaders();
+    public String pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSS'Z'";
+    public SimpleDateFormat formatter = new SimpleDateFormat(pattern);
+    public HttpEntity entity;
+    public String urlToTwitterApi = "https://api.twitter.com/2/tweets/search/recent?query=";
+    public ObjectMapper objectMapper;
+    public ModelMapper modelMapper;
 
-    @Autowired
-    public MainService(TweetRepo tweetRepo, KeywordRepo keywordRepo, AuthorRepo authorRepo, Environment environment) {
+    public MainService(TweetRepo tweetRepo, KeywordRepo keywordRepo, AuthorRepo authorRepo) {
         this.tweetRepo = tweetRepo;
         this.keywordRepo = keywordRepo;
         this.authorRepo = authorRepo;
-        this.headers.set("Authorization", "Bearer " + environment.getProperty("baererKey"));
+        this.headers.set("Authorization", "Bearer " + System.getenv("baererKey"));
         entity = new HttpEntity(headers);
         objectMapper = new ObjectMapper();
         modelMapper = new ModelMapper();
         rest = new RestTemplate();
+    }
+
+    public List<KeywordDTO> getAllKeywords(){
+        return keywordRepo.findAll().stream().map(this::convertToDto).toList();
+    }
+
+    public List<TweetDTO> getAllTweetsById(String id){
+        return tweetRepo.findAllByKeywordIdAndDeletedFalseOrderByCreatedAtDesc(Long.valueOf(id)).stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+
+    public List<KeywordDTO> createKeyword(String keywordString) throws Exception {
+        return getTweetsWithKeyword(keywordString).stream().map(this::convertToDto).toList();
+    }
+
+    public ResponseEntity deleteKeyword(String id){
+        tweetRepo.deleteAllByKeywordId(Long.valueOf(id));
+        keywordRepo.deleteById(Long.valueOf(id));
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("deleted", Boolean.TRUE);
+        return ResponseEntity.ok(response);
+    }
+
+    public List<TweetDTO> getAllTweetsByAuthorName(String name) {
+        return tweetRepo.findAllByAuthorUserNameAndDeletedFalseOrderByCreatedAtDesc(name).stream().map(this::convertToDto).toList();
+    }
+
+    public ResponseEntity deleteTweetById(String id) {
+        Tweet tweet = tweetRepo.findById(Long.valueOf(id)).get();
+        tweet.setDeleted(true);
+        tweetRepo.save(tweet);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("deleted", Boolean.TRUE);
+        return ResponseEntity.ok(response);
+    }
+
+    public AuthorDTO addAuthorToFavourite(String id) throws Exception {
+        Author author = authorRepo.findById(Long.valueOf(id)).get();
+        author.setFavourite(true);
+        getTweetsByAuthorId(id);
+        return convertToDto(authorRepo.save(author));
+    }
+
+    public List<AuthorDTO> getFavouriteAuthors() {
+        return authorRepo.findAuthorByFavouriteTrue().stream().map(this::convertToDto).toList();
+    }
+
+    public ResponseEntity deleteFavouriteAuthor(String id) {
+        Author author = authorRepo.findById(Long.valueOf(id)).get();
+        tweetRepo.deleteAllByAuthor_IdAndAuthorFavourite(author.getId(), true);
+        author.setFavourite(false);
+        authorRepo.save(author);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("deleted", Boolean.TRUE);
+        return ResponseEntity.ok(response);
+    }
+
+    public List<TweetDTO> getFavouriteAuthors(String id) {
+        return tweetRepo.findAllByAuthorIdAndDeletedIsFalseOrderByCreatedAtDesc(Long.valueOf(id)).stream().map(this::convertToDto).toList();
+    }
+
+    public List<TweetDTO> getTrashTweets() {
+        return tweetRepo.findAllByDeletedIsTrueOrderByCreatedAtDesc().stream().map(this::convertToDto).toList();
+    }
+
+    public ResponseEntity deleteTweetPermament(String id) {
+        tweetRepo.deleteById(Long.valueOf(id));
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("deleted", Boolean.TRUE);
+        return ResponseEntity.ok(response);
+    }
+
+    public ResponseEntity revertDeletedTweet(String id) {
+        Tweet tweet = tweetRepo.findById(Long.valueOf(id)).get();
+        tweet.setDeleted(false);
+        tweetRepo.save(tweet);
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("reverted", Boolean.TRUE);
+        return ResponseEntity.ok(response);
+    }
+
+    public void refleshDatabase() throws Exception {
+        Iterable<Keyword> keywordList = keywordRepo.findAll();
+        refleshDatabaseImp((List<Keyword>) keywordList);
     }
 
     public TweetDTO convertToDto(Tweet tweet) {
@@ -69,6 +154,7 @@ public class MainService {
         if (StringUtils.isBlank(response.getBody())) {
             throw new Exception("Empty response");
         }
+        System.out.println(response.getBody());
         return response.getBody();
     }
 
@@ -144,7 +230,8 @@ public class MainService {
                             formatter.parse(data.getCreatedAt()),
                             data.getText(),
                             authorRepo.findById(Long.valueOf(data.getAuthorId())).get(),
-                            data.getLang(), keywordRepo.findById(keyword.getId()).get(),
+                            data.getLang(),
+                            keywordRepo.findById(keyword.getId()).get(),
                             false));
                 }
             }
@@ -157,5 +244,4 @@ public class MainService {
             }
         }
     }
-
 }

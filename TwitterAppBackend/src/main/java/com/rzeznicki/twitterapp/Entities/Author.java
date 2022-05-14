@@ -37,6 +37,8 @@ public class Author {
         this.favourite = favourite;
     }
 
+
+
     public boolean isFavourite() {
         return favourite;
     }
@@ -75,5 +77,16 @@ public class Author {
 
     public void setTweets(List<Tweet> tweets) {
         this.tweets = tweets;
+    }
+
+    @Override
+    public String toString() {
+        return "Author{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", userName='" + userName + '\'' +
+                ", tweets=" + tweets +
+                ", favourite=" + favourite +
+                '}';
     }
 }
