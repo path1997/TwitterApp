@@ -143,19 +143,23 @@ public class MainService {
     }
 
     public String performRequestToTwitterApi(String query) throws Exception {
-        ResponseEntity<String> response = rest.exchange(
-                urlToTwitterApi + query,
-                HttpMethod.GET,
-                entity,
-                String.class);
+        ResponseEntity<String> response = performRequestImpl(urlToTwitterApi+query);
         if (!response.getStatusCode().is2xxSuccessful()) {
-            throw new Exception("Error code: " + response.getStatusCode().value() + "error message:" + response.getBody());
+            throw new Exception("Error code: " + response.getStatusCode().value() + " error message:" + response.getBody());
         }
         if (StringUtils.isBlank(response.getBody())) {
             throw new Exception("Empty response");
         }
         System.out.println(response.getBody());
         return response.getBody();
+    }
+
+    public ResponseEntity<String> performRequestImpl(String url){
+        return rest.exchange(
+                url,
+                HttpMethod.GET,
+                entity,
+                String.class);
     }
 
     public List<Keyword> getTweetsWithKeyword(String keyword) throws Exception {

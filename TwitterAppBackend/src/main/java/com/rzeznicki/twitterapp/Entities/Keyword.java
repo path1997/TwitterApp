@@ -19,7 +19,7 @@ public class Keyword {
     private int twitCounterLastSearch;
     private boolean keywordIsAuthor;
     @JsonIgnore
-    @OneToMany(mappedBy = "keyword")
+    @OneToMany(mappedBy = "keyword", fetch = FetchType.EAGER)
     private List<Tweet> tweets;
 
     public Keyword() {

@@ -18,6 +18,7 @@ import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -253,6 +254,62 @@ public class MainServiceTest {
         verify(authorRepoMock, times(172)).save(any());
         verify(tweetRepoMock, times(200)).save(any());
         verify(keywordRepoMock, times(2)).save(any());
+    }
+
+    @Test
+    public void performRequestToTwitterApi_shouldReturnResponseBody() throws Exception {
+        //given
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(MediaType.APPLICATION_JSON);
+        ResponseEntity<String> responseEntity = new ResponseEntity<>(
+                "Test responseBody",
+                header,
+                HttpStatus.OK
+        );
+
+        //when
+        doReturn(responseEntity).when(mainService).performRequestImpl(anyString());
+
+        //then
+        assertThat(mainService.performRequestToTwitterApi("Test"), equalTo("Test responseBody"));
+    }
+
+    @Test
+    public void performRequestToTwitterApi_shouldReturnExceptionBadErrorCode() throws Exception {
+        //given
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(MediaType.APPLICATION_JSON);
+        ResponseEntity<String> responseEntity = new ResponseEntity<>(
+                "Test responseBody",
+                header,
+                HttpStatus.INTERNAL_SERVER_ERROR
+        );
+
+        //when
+        doReturn(responseEntity).when(mainService).performRequestImpl(anyString());
+
+        //then
+        Exception thrown = assertThrows(Exception.class, () -> mainService.performRequestToTwitterApi("123"));
+        assertThat(thrown.getMessage(), equalTo("Error code: 500 error message:Test responseBody"));
+    }
+
+    @Test
+    public void performRequestToTwitterApi_shouldReturnExceptionEmptyResponseBody() throws Exception {
+        //given
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(MediaType.APPLICATION_JSON);
+        ResponseEntity<String> responseEntity = new ResponseEntity<>(
+                null,
+                header,
+                HttpStatus.OK
+        );
+
+        //when
+        doReturn(responseEntity).when(mainService).performRequestImpl(anyString());
+
+        //then
+        Exception thrown = assertThrows(Exception.class, () -> mainService.performRequestToTwitterApi("123"));
+        assertThat(thrown.getMessage(), equalTo("Empty response"));
     }
 
 }
