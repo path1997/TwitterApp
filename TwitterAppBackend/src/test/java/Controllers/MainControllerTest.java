@@ -36,7 +36,6 @@ public class MainControllerTest {
 
     @Test
     public void createKeyword_shouldAddKeyword() throws Exception {
-        System.out.println(keywordRepo.findAll());
         mockMvc.perform(
                         post("/v1/keywords")
                         .contentType(MediaType.APPLICATION_JSON)
